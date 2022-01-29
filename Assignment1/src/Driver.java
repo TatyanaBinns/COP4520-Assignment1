@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.BitSet;
@@ -46,10 +49,19 @@ public class Driver {
 
 		Duration exectime = Duration.between(start, Instant.now());
 
-		reportFoundPrimes(MAX_PRIME_SIZE, res, exectime);
+		String output = reportFoundPrimes(MAX_PRIME_SIZE, res, exectime);
+		try {
+			Files.write(Paths.get(".", "primes.txt"), output.getBytes());
+		} catch (IOException e) {
+			System.err.println("Error writing data out to file.");
+			System.err.println("Output would have been:");
+			System.err.println(output);
+			e.printStackTrace();
+		}
 	}
 
-	private static void reportFoundPrimes(int n, BitSet arr, Duration exectime) {
+	private static String reportFoundPrimes(int n, BitSet arr, Duration exectime) {
+		StringBuilder res = new StringBuilder();
 		int count = 0;
 		long sum = 0;
 
@@ -64,11 +76,12 @@ public class Driver {
 				.previousSetBit(prime - 1))
 			top[i] = prime;
 
-		System.out.println(exectime.getSeconds() + "." + String.format("%03ds", exectime.getNano() / 1_000_000) + " "
-				+ count + " " + sum + "\n");
+		res.append(exectime.getSeconds() + "." + String.format("%03ds", exectime.getNano() / 1_000_000) + " " + count
+				+ " " + sum + "\n");
 
 		for (int i : top)
-			System.out.println(i);
+			res.append(i).append('\n');
+		return res.toString();
 	}
 
 }
