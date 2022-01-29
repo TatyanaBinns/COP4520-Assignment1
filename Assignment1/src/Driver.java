@@ -8,13 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Driver {
 	private static final int MAX_PRIME_SIZE = 100_000_000;
-	private static final int THREAD_COUNT = 2;
+	private static final int THREAD_COUNT = 8;
 
-	private static void findMultiples(BitSet arr, AtomicInteger sharedCounter) {
-		int p;
-		while ((p = sharedCounter.getAndIncrement()) < MAX_PRIME_SIZE)
-			for (int i = 2 * p; i < MAX_PRIME_SIZE; i += p)
+	private static void findMultiples(BitSet arr, int startPoint, int toSet) {
+		for (int p = 2; p < MAX_PRIME_SIZE / 2; p++) {
+			int start = startPoint - (startPoint % p);
+			for (int i = Math.max(2 * p, start); i < startPoint + toSet; i += p)
 				arr.set(i);
+		}
 	}
 
 	public static void main(String[] args) throws InterruptedException {
@@ -26,7 +27,9 @@ public class Driver {
 		for (int i = 0; i < threads.length; i++) {
 			BitSet b = new BitSet(MAX_PRIME_SIZE);
 			arr[i] = b;
-			threads[i] = new Thread(() -> findMultiples(b, sharedCounter));
+			int areaEach = MAX_PRIME_SIZE / THREAD_COUNT;
+			int startPoint = i * areaEach;
+			threads[i] = new Thread(() -> findMultiples(b, startPoint, areaEach + 1));
 		}
 
 		Instant start = Instant.now();
