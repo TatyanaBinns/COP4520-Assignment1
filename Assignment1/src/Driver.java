@@ -64,7 +64,7 @@ public class Driver {
 				.previousSetBit(prime - 1))
 			top[i] = prime;
 
-		System.out.println(exectime.getSeconds() + "." + String.format("%03d", exectime.getNano() / 1_000_000) + " "
+		System.out.println(exectime.getSeconds() + "." + String.format("%03ds", exectime.getNano() / 1_000_000) + " "
 				+ count + " " + sum + "\n");
 
 		for (int i : top)
